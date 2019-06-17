@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/itbread/lotteryport/datamodels"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 type SsqService interface {

@@ -1,6 +1,10 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/itbread/lotteryport/datamodels"
+	"github.com/itbread/lotteryport/utils/http"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/mvc"
 	"github.com/itbread/lotteryport/controllers"
@@ -15,7 +19,14 @@ func main() {
 	users := mvc.New(app.Party("/ssq"))  // 一个根路径为 /users 的组
 
 	users.Handle(new(controllers.SsqController)) // 定义组的controller
-
+var ssq datamodels.Ssq
+	ssq.Code="20190616"
+	bytes,err:=json.Marshal(ssq)
+	if err!=nil {
+		
+	}
+	fmt.Println(string(bytes))
+	http.Get()
 	app.Get("/", func(ctx iris.Context) {
 		// 绑定： {{.message}}　为　"Hello world!"
 		ctx.ViewData("message", "Hello world!")
