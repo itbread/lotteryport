@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/kataras/iris"
-	"lotteryweb/services"
+	"github.com/itbread/lotteryport/services"
 )
 
 type SsqController struct {
