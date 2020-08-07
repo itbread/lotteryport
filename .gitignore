@@ -1,0 +1,5 @@
+bindata.go
+lotteryport
+.DS_Store
+.idea
+go.sum
