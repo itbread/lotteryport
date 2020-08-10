@@ -1,13 +1,17 @@
 package datasource
 
 import (
+	"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/itbread/lotteryport/configer"
 	"github.com/itbread/lotteryport/datamodels"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 
-func InitPgsqlDb(config *configer.Config) (db *gorm.DB, err error) {
+func InitDb(config *configer.Config) (db *gorm.DB, err error) {
+	fmt.Printf("config:%v", spew.Sprintf("%#v", config))
 	db, err = gorm.Open(config.Sqlite.DbName, config.Sqlite.DbFile)
 	if err != nil {
 		panic("连接数据库失败")

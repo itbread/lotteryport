@@ -15,5 +15,6 @@ type BallInfo struct {
 	Red4 string `json:"red4"`
 	Red5 string `json:"red5"`
 	Red6 string `json:"red6"`
+	Red  string `json:"red"`
 	Blue string `json:"blue"`
 }

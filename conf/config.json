@@ -1,8 +1,7 @@
 {
-  "config": {
-    "sqlite": {
-      "db_name": "sqlite3",
-      "db_file": "lotteryport.db"
-    }
-  }
+  "sqlite": {
+    "db_name": "sqlite3",
+    "db_file": "lotteryport.db"
+  },
+  "port": 9090
 }

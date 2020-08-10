@@ -2,6 +2,7 @@ package configer
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -9,6 +10,7 @@ import (
 
 type Config struct {
 	Sqlite Sqlite `json:"sqlite"`
+	Port   int    `json:"port"`
 }
 
 type PostgreSql struct {
@@ -32,17 +34,30 @@ func NewConfiger(configPath string) *Config {
 		log.Printf("Configuration File %v Not Exists", configPath)
 	}
 	readTmpFromJson(configPath, &confTmp)
-	log.Printf("%v\n", confTmp)
+	log.Printf("confTmp====%v\n", confTmp)
 	return &confTmp
 }
 
 //ReadTmpFromJson json 文件转map
 //读取json文件转成map
-func readTmpFromJson(fileName string, obj interface{}) error {
+func readTmpFromJson(fileName string, args ...interface{}) error {
+	var respStruct interface{}
+	switch len(args) {
+	case 1:
+		respStruct = args[0]
+	case 2:
+		respStruct = args[1]
+	default:
+		return errors.New("function must have 2 or 3 arguments")
+	}
 	contents, err := ioutil.ReadFile(fileName)
+	//log.Printf("readTmpFromJson err====%v contents=%v\n", err, string(contents))
 	if err == nil {
-		er := json.Unmarshal(contents, obj)
-		if er != nil {
+		//buffer := new(bytes.Buffer)
+		//buffer.Write(contents)
+		//err = json.NewDecoder(buffer).Decode(&respStruct)
+		err := json.Unmarshal(contents, &respStruct)
+		if err != nil {
 			log.Printf("Unmarshal err:%v \n", err)
 		}
 	} else {
