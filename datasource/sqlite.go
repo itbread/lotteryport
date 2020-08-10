@@ -17,7 +17,7 @@ func InitDb(config *configer.Config) (db *gorm.DB, err error) {
 		panic("连接数据库失败")
 		return nil, err
 	}
-	defer db.Close()
+	//defer db.Close()
 	db.DB().SetConnMaxLifetime(240)
 	db.LogMode(true)
 	db.DB().SetMaxIdleConns(10) //解决 有时返回 EOF

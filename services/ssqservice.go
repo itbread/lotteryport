@@ -110,7 +110,7 @@ func (h *examStandardService) GetSsqs(offset int, limit int, mp map[string]inter
 
 	Db := h.db.Model(&datamodels.Ssq{})
 	err = Db.Where(mp).
-		Order("serial_id asc").
+		Order("code asc").
 		Count(&resp.Total).Offset(offset).Limit(limit).
 		Scan(&resp.Objects).Error
 

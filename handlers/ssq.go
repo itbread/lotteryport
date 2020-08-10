@@ -36,19 +36,26 @@ func (h *ssqHandler) GetSsqHistory(ctx iris.Context) {
 	offset, limit := ReadOffsetAndLimit(ctx.Request())
 	mp := make(map[string]interface{})
 	h.service.GetSsqs(offset, limit, mp)
-	err := utils.SsqHttpClientGet(issueStart, issueEnd, pageNo, &resp)
+	//err := utils.SsqHttpClientGet(issueStart, issueEnd, pageNo, &resp)
+	err := utils.DoHttpget(issueStart, issueEnd, pageNo, &resp)
 	if err != nil {
 		log.Printf("请求 ssq服务器.Error: %v\n", err)
 		ctx.JSON(SubErr(OpearteErr, errText[OpearteErr], resp))
 		return
 	} else {
 		log.Printf("存储数据到数据库:")
-		err=h.service.Createlist(resp.Result)
-		if err != nil {
-			log.Printf("========Createlist.Error: %v\n", err)
-			ctx.JSON(SubErr(OpearteErr, errText[OpearteErr], resp))
-			return
+		if len(resp.Result) > 0 {
+			log.Printf("==========存储数据到数据库:")
+			err=h.service.Createlist(resp.Result)
+			if err != nil {
+				log.Printf("========Createlist.Error: %v\n", err)
+				ctx.JSON(SubErr(OpearteErr, errText[OpearteErr], resp))
+				return
+			}
+		}else{
+			log.Printf("resp.Result=====:%v",resp.Result)
 		}
+
 	}
 	ctx.JSON(SubErr(Success, errText[Success], resp))
 	return

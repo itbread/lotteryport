@@ -159,6 +159,7 @@ func httpRequest(method string, url string, head map[string]string, args ...inte
 	} else {
 		data = string(sendBody)
 	}
+
 	log.Printf("Send Data:%v\n", data)
 	client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
