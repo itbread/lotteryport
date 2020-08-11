@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"github.com/itbread/lotteryport/datamodels"
 	"github.com/itbread/lotteryport/utils"
 	"github.com/kataras/iris/v12"
 	"log"
+	"strings"
 )
 
 //
@@ -33,27 +35,39 @@ func (h *ssqHandler) GetSsqHistory(ctx iris.Context) {
 	issueStart := int(ctx.URLParamInt32Default("issueStart", 0))
 	issueEnd := int(ctx.URLParamInt32Default("issueEnd", 0))
 	pageNo := int(ctx.URLParamInt32Default("pageNo", 1))
-	offset, limit := ReadOffsetAndLimit(ctx.Request())
-	mp := make(map[string]interface{})
-	h.service.GetSsqs(offset, limit, mp)
+	//offset, limit := ReadOffsetAndLimit(ctx.Request())
+	//mp := make(map[string]interface{})
+	//h.service.GetSsqs(offset, limit, mp)
 	//err := utils.SsqHttpClientGet(issueStart, issueEnd, pageNo, &resp)
-	err := utils.DoHttpget(issueStart, issueEnd, pageNo, &resp)
+	err := utils.GetSsqHistory(issueStart, issueEnd, pageNo, &resp)
 	if err != nil {
 		log.Printf("请求 ssq服务器.Error: %v\n", err)
 		ctx.JSON(SubErr(OpearteErr, errText[OpearteErr], resp))
 		return
 	} else {
 		log.Printf("存储数据到数据库:")
+		var list    []datamodels.Ssq
 		if len(resp.Result) > 0 {
+			for _,item:=range resp.Result{
+				if arr:=strings.Split(item.Red,",");len(arr)>5{
+					item.Red1=arr[0]
+					item.Red2=arr[1]
+					item.Red3=arr[2]
+					item.Red4=arr[3]
+					item.Red5=arr[4]
+					item.Red6=arr[5]
+				}
+				list=append(list,item)
+			}
 			log.Printf("==========存储数据到数据库:")
-			err=h.service.Createlist(resp.Result)
+			err = h.service.Createlist(list)
 			if err != nil {
 				log.Printf("========Createlist.Error: %v\n", err)
 				ctx.JSON(SubErr(OpearteErr, errText[OpearteErr], resp))
 				return
 			}
-		}else{
-			log.Printf("resp.Result=====:%v",resp.Result)
+		} else {
+			log.Printf("resp.Result=====:%v", resp.Result)
 		}
 
 	}

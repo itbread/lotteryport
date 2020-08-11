@@ -7,6 +7,8 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
 	"log"
+	"time"
+	stdContext "context"
 )
 
 func main() {
@@ -16,6 +18,12 @@ func main() {
 	//datasource.InitDb(config)
 	app := iris.New()
 	app.Use(logMiddleware())
+	iris.RegisterOnInterrupt(func() { //服务中断做相应处理
+		timeout := 5 * time.Second
+		ctx, cancel := stdContext.WithTimeout(stdContext.Background(), timeout)
+		defer cancel()
+		app.Shutdown(ctx)
+	})
 	tmpl := iris.Django("./templates/views", ".html").Reload(true) //是否更新
 	app.RegisterView(tmpl)
 	app.HandleDir("/statics", "./templates/statics") //指定静态文件路径
