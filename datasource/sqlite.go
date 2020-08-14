@@ -2,13 +2,13 @@ package datasource
 
 import (
 	"fmt"
+
 	"github.com/davecgh/go-spew/spew"
 	"github.com/itbread/lotteryport/configer"
 	"github.com/itbread/lotteryport/datamodels"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
-
 
 func InitDb(config *configer.Config) (db *gorm.DB, err error) {
 	fmt.Printf("config:%v", spew.Sprintf("%#v", config))
@@ -25,5 +25,6 @@ func InitDb(config *configer.Config) (db *gorm.DB, err error) {
 
 	// 自动迁移模式
 	db.AutoMigrate(&datamodels.Ssq{})
+	db.AutoMigrate(&datamodels.Dlt{})
 	return db, err
 }
