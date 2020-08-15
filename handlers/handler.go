@@ -17,9 +17,14 @@ type ssqHandler struct {
 	Handler
 	service services.SsqService
 }
+type dltHandler struct {
+	Handler
+	service services.DltService
+}
 
 type Handlers struct {
 	SsqHandler *ssqHandler
+	DltHandler *dltHandler
 }
 
 func NewHandler(config *configer.Config) *Handlers {
@@ -30,8 +35,10 @@ func NewHandler(config *configer.Config) *Handlers {
 		return nil
 	}
 	ssqService := services.NewSsqService(db)
+	dltService := services.NewDltService(db)
 	basehand := Handler{config: config, db: db}
 	return &Handlers{
 		SsqHandler: &ssqHandler{Handler: basehand, service: ssqService},
+		DltHandler: &dltHandler{Handler: basehand, service: dltService},
 	}
 }

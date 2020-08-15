@@ -12,9 +12,9 @@ type DltService interface {
 	Create(req datamodels.Dlt) (DltResp, error)
 	Createlist(list []datamodels.Dlt) error
 	//查询
-	GetSsq(code string) (DltResp, error)
+	GetDlt(code string) (DltResp, error)
 	//查询list
-	GetSsqs(offset int, limit int, mp map[string]interface{}) (DltPagingResp, error)
+	GetDlts(offset int, limit int, mp map[string]interface{}) (DltPagingResp, error)
 	//删除
 	Delete(code string) error
 	//更新
@@ -91,7 +91,7 @@ func (h *dltService) Createlist(list []datamodels.Dlt) error {
 
 }
 
-func (h *dltService) GetSsq(code string) (DltResp, error) {
+func (h *dltService) GetDlt(code string) (DltResp, error) {
 	var resp DltResp
 	err := h.db.Model(&datamodels.Dlt{}).
 		Where("code=?", code).Scan(&resp).Error
@@ -103,7 +103,7 @@ func (h *dltService) GetSsq(code string) (DltResp, error) {
 	return resp, err
 }
 
-func (h *dltService) GetSsqs(offset int, limit int, mp map[string]interface{}) (DltPagingResp, error) {
+func (h *dltService) GetDlts(offset int, limit int, mp map[string]interface{}) (DltPagingResp, error) {
 	var resp DltPagingResp
 	var err error
 	resp.Offset = offset

@@ -33,14 +33,14 @@ func NewConfiger(configPath string) *Config {
 	if os.IsNotExist(err) {
 		log.Printf("Configuration File %v Not Exists", configPath)
 	}
-	readTmpFromJson(configPath, &confTmp)
+	ReadTmpFromJson(configPath, &confTmp)
 	log.Printf("confTmp====%v\n", confTmp)
 	return &confTmp
 }
 
 //ReadTmpFromJson json 文件转map
 //读取json文件转成map
-func readTmpFromJson(fileName string, args ...interface{}) error {
+func ReadTmpFromJson(fileName string, args ...interface{}) error {
 	var respStruct interface{}
 	switch len(args) {
 	case 1:
@@ -51,7 +51,7 @@ func readTmpFromJson(fileName string, args ...interface{}) error {
 		return errors.New("function must have 2 or 3 arguments")
 	}
 	contents, err := ioutil.ReadFile(fileName)
-	//log.Printf("readTmpFromJson err====%v contents=%v\n", err, string(contents))
+	//log.Printf("ReadTmpFromJson err====%v contents=%v\n", err, string(contents))
 	if err == nil {
 		//buffer := new(bytes.Buffer)
 		//buffer.Write(contents)

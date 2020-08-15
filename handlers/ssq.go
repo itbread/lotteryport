@@ -37,7 +37,7 @@ func (h *ssqHandler) GetSsqHistory(ctx iris.Context) {
 	pageNo := int(ctx.URLParamInt32Default("pageNo", 1))
 	//offset, limit := ReadOffsetAndLimit(ctx.Request())
 	//mp := make(map[string]interface{})
-	//h.service.GetSsqs(offset, limit, mp)
+	//h.service.GetDlts(offset, limit, mp)
 	//err := utils.SsqHttpClientGet(issueStart, issueEnd, pageNo, &resp)
 	err := utils.GetSsqHistory(issueStart, issueEnd, pageNo, &resp)
 	if err != nil {
