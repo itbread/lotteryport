@@ -1,5 +1,6 @@
 bindata.go
 lotteryport
+lotteryport.exe
 .DS_Store
 .idea
 go.sum
