@@ -8,5 +8,6 @@ func (h *homeHandler) Home(ctx iris.Context) {
 		"curUrl":      ctx.Path(),
 		"Title":  "首页",
 		"secondTitle": "系统首页",
+		"version":     "1.0",
 	})
 }

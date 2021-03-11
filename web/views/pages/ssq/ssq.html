@@ -1,0 +1,99 @@
+{% extends "shared/header.html" %}
+
+{% block navTop %}
+<link rel="stylesheet" href="/statics/css/public.css?v={{version}}" media="all" />
+<style>
+    .layui-table{ width: 100%;}
+    .downTemplateBtn a{
+        color: #888;padding-left: 6px;font-size: 9px;
+    }
+    .downTemplateBtn a:hover {
+        color: #06c;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="margin: 0 auto;">
+    <form class="layui-form">
+        <blockquote class="layui-elem-quote quoteBox">
+            <form class="layui-form">
+                <div class="layui-inline">
+                    <div style="width: 80px;" class="layui-input-inline">
+                        <input type="text" class="layui-input" placeholder="学员姓名" maxlength="15" id="soName"/>
+                    </div>
+                    <div style="width: 80px;" class="layui-input-inline">
+                        <input type="text" class="layui-input" placeholder="考场名称" maxlength="15" id="soExamName"/>
+                    </div>
+                    <div class="layui-input-inline" style="width: 100px;" pc>
+                        <select name="soKm" id="soKm" class="soKm">
+                            <option value="">参考科目</option>
+                            <option value="1">科目1</option>
+                            <option value="2">科目2</option>
+                            <option value="3">科目3</option>
+                            <option value="4">科目4</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline" style="width: 100px;" pc>
+                        <select name="soExamResult" id="soExamResult" class="soExamResult">
+                            <option value="">考试结果</option>
+                            <option value="0">未知</option>
+                            <option value="1">通过</option>
+                            <option value="2">未通过</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline" style="width: 100px;" pc>
+                        <select name="soOrderStatus" id="soOrderStatus" class="soOrderStatus">
+                            <option value="">预约情况</option>
+                            <option value="0">未预约</option>
+                            <option value="1">预约成功</option>
+                            <option value="2">预约失败</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline" style="width: 100px;" pc>
+                        <select name="soFeeStatus" id="soFeeStatus" class="soFeeStatus">
+                            <option value="">缴费情况</option>
+                            <option value="0">未缴费</option>
+                            <option value="1">缴费成功</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline" style="width: 100px;" pc>
+                        <input type="text" class="layui-input" name="startAt" id="test-laydate-start" value="" placeholder="考试开始日期" readonly/>
+                    </div>
+                    <div class="layui-input-inline">-</div>
+                    <div class="layui-input-inline" style="width: 100px;" pc>
+                        <input type="text" class="layui-input" name="endAt" id="test-laydate-end" value="" placeholder="考试结束日期" readonly/>
+                    </div>
+                    <a class="layui-btn search_btn" id="search_btn_find" data-type="reload">搜索</a>
+                </div>
+                <div class="layui-inline">
+                    <a class="layui-btn layui-btn-primary" id="addNews_btn" href="javascript:void(0);">新增</a>
+                    <a class="layui-btn layui-btn-primary export_btn" href="javascript:void(0);">导出excel</a>
+                    <a class="layui-btn layui-btn-primary" id="import_exam_btn" href="javascript:void(0);">学员约考记录导入</a>
+                    <span class="downTemplateBtn">
+						<a style="" href="/statics/xls/学员约考记录表模板V1.0.02.xlsx" target="_blank" title="点击下载学员约考记录表模板">下载模板</a>
+					</span>
+                    <input type="hidden" id="uploadListAction2">
+                </div>
+                <div class="layui-inline" style="display: none">
+                    <a class="layui-btn layui-btn-primary delAll_btn">批量删除</a>
+                </div>
+            </form>
+        </blockquote>
+        <table id="newList" lay-filter="newList"></table>
+
+        <!--操作-->
+        <script type="text/html" id="newsListBar">
+            <a style="color: #06c" lay-event="edit">编辑</a>
+            <a style="color: #06c" lay-event="del">删除</a>
+        </script>
+
+    </form>
+</div>
+{% endblock %}
+
+{% block footer %}
+
+<script type="text/javascript" src="/statics/js/common/common.js?v={{version}}"></script>
+<script type="text/javascript" src="/statics/js/ssq/ssq.js?v={{version}}"></script>
+{% endblock %}

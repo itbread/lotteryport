@@ -6,7 +6,7 @@
     多行注释使用
     {%endcomment%}
     <meta charset="utf-8">
-    <title>{{curPage}}--{{webConfig.Title}}</title>
+    <title>{{curPage}}</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
@@ -15,20 +15,20 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
     <link rel="icon" href="/statics/favicon.ico">
-    <link rel="stylesheet" href="/statics/layui/css/layui.2.5.4.css?v={{webConfig.JsVersion}}" media="all" />
-    <link rel="stylesheet" href="/statics/css/index.css?v={{webConfig.JsVersion}}" media="all" />
-    <script type="text/javascript" src="/statics/layui/layui.js?v={{webConfig.JsVersion}}"></script>
+    <link rel="stylesheet" href="/statics/layui/css/layui.css?v={{version}}" media="all" />
+    <link rel="stylesheet" href="/statics/css/index.css?v={{version}}" media="all" />
+    <script type="text/javascript" src="/statics/layui/layui.js?v={{version}}"></script>
     <script>
         var msgPwdErrorGlobal = "密码格式不符合规范，请确保密码里面含有大小写字母、数字和特殊字母，并且长度为8～18位。";
         var cannotContainSpecialCharacters = "输入不能含有特殊字符！";
         {% ifequal sessionInfo.Super true %}
         layui.config({
-            version: "{{webConfig.JsVersion}}"
+            version: "{{version}}"
         });
         {% else %}
         layui.config({
             base : "/statics/js/common/",
-            version: "{{webConfig.JsVersion}}"
+            version: "{{version}}"
         });
         {% endifequal %}
         var usernameHeader = "{{sessionInfo.UsernameStar}}";

@@ -46,18 +46,18 @@ func (h *ssqHandler) GetSsqHistory(ctx iris.Context) {
 		return
 	} else {
 		log.Printf("存储数据到数据库:")
-		var list    []datamodels.Ssq
+		var list []datamodels.Ssq
 		if len(resp.Result) > 0 {
-			for _,item:=range resp.Result{
-				if arr:=strings.Split(item.Red,",");len(arr)>5{
-					item.Red1=arr[0]
-					item.Red2=arr[1]
-					item.Red3=arr[2]
-					item.Red4=arr[3]
-					item.Red5=arr[4]
-					item.Red6=arr[5]
+			for _, item := range resp.Result {
+				if arr := strings.Split(item.Red, ","); len(arr) > 5 {
+					item.Red1 = arr[0]
+					item.Red2 = arr[1]
+					item.Red3 = arr[2]
+					item.Red4 = arr[3]
+					item.Red5 = arr[4]
+					item.Red6 = arr[5]
 				}
-				list=append(list,item)
+				list = append(list, item)
 			}
 			log.Printf("==========存储数据到数据库:")
 			err = h.service.Createlist(list)
@@ -104,5 +104,15 @@ func (h *ssqHandler) GetSsqList(ctx iris.Context) {
 	mp := make(map[string]interface{})
 	h.service.GetSsqs(offset, limit, mp)
 	ctx.JSON(SubErr(Success, errText[Success]))
+	return
+}
+func (h *ssqHandler) GetSsqListPage(ctx iris.Context) {
+	ctx.View("pages/ssq/ssq.html", iris.Map{
+		"curPage":     "双色球",
+		"curUrl":      ctx.Path(),
+		"Title":       "双色球",
+		"secondTitle": "双色球列表",
+		"version":     "1.0",
+	})
 	return
 }

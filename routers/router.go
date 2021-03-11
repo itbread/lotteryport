@@ -29,6 +29,7 @@ func homeRoute(party iris.Party, newHandlers *handlers.Handlers) {
 func ssqRoute(party iris.Party, newHandlers *handlers.Handlers) {
 	party.Get("/history", newHandlers.SsqHandler.GetSsqHistory)
 	party.Get("/list", newHandlers.SsqHandler.GetSsqList)
+	party.Get("/listPage", newHandlers.SsqHandler.GetSsqListPage)
 }
 func kl8Route(party iris.Party, newHandlers *handlers.Handlers) {
 	party.Get("/history", newHandlers.Kl8Handler.GetKl8History)
