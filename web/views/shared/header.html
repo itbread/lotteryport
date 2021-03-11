@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {%comment%}
+    这是多行注释，整个网站的共用部分
+    多行注释使用
+    {%endcomment%}
+    <meta charset="utf-8">
+    <title>{{curPage}}--{{webConfig.Title}}</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="/statics/favicon.ico">
+    <link rel="stylesheet" href="/statics/layui/css/layui.2.5.4.css?v={{webConfig.JsVersion}}" media="all" />
+    <link rel="stylesheet" href="/statics/css/index.css?v={{webConfig.JsVersion}}" media="all" />
+    <script type="text/javascript" src="/statics/layui/layui.js?v={{webConfig.JsVersion}}"></script>
+    <script>
+        var msgPwdErrorGlobal = "密码格式不符合规范，请确保密码里面含有大小写字母、数字和特殊字母，并且长度为8～18位。";
+        var cannotContainSpecialCharacters = "输入不能含有特殊字符！";
+        {% ifequal sessionInfo.Super true %}
+        layui.config({
+            version: "{{webConfig.JsVersion}}"
+        });
+        {% else %}
+        layui.config({
+            base : "/statics/js/common/",
+            version: "{{webConfig.JsVersion}}"
+        });
+        {% endifequal %}
+        var usernameHeader = "{{sessionInfo.UsernameStar}}";
+        var webBlackPlaceId = "{{sessionInfo.PlaceId}}";
+        function IsPC() {
+            var userAgentInfo = navigator.userAgent;
+            var Agents = ["Android", "iPhone",
+                "SymbianOS", "Windows Phone",
+                "iPad", "iPod"];
+            var flag = true;
+            for (var v = 0; v < Agents.length; v++) {
+                if (userAgentInfo.indexOf(Agents[v]) > 0) {
+                    flag = false;
+                    break;
+                }
+            }
+            return flag;
+        }
+        var isPcAgent = IsPC();
+    </script>
+    {% block navTop %}
+
+    {% endblock %}
+    <style>
+        .layui-nav .layui-this:after {
+            bottom: -1px!important;
+        }
+        .layui-this>a:hover{
+            background-color: #009688;
+            color: #fff;
+        }
+        .red{color: red;}
+        a{cursor:pointer;}
+        .disabled{background:#efefef;cursor: not-allowed;}
+        /* 浏览器宽度小于等于1400px时 */
+        @media screen and (max-width: 1125px){
+            .logo{width: auto;padding:0 12px;}
+            .layui-nav .layui-nav-item a {
+                display: block;
+                padding: 0 6px
+            }
+            .layui-nav .layui-nav-more{right: -6px;}
+            #navBar .layui-nav-more{right: 9px;}
+            .setHomeShow a{
+                display: none!important;
+            }
+        }
+        @media screen and (min-width:1126px) and (max-width:1240px){
+            .logo{width: auto;padding:0 18px;}
+            .layui-nav .layui-nav-item a {
+                display: block;
+                padding: 0 9px
+            }
+            .layui-nav .layui-nav-more{right: -6px;}
+            #navBar .layui-nav-more{right: 9px;}
+            .setHomeShow a{
+                display: none!important;
+            }
+        }
+        /* 浏览器宽度小于等于1400px时 */
+        @media screen and (min-width:1241px) and (max-width:1470px){
+            .logo{width: auto;padding:0 30px;}
+            .layui-nav .layui-nav-item a {
+                display: block;
+                padding: 0 12px;
+            }
+            .layui-nav .layui-nav-more{right: -6px;}
+            #navBar .layui-nav-more{right: 9px;}
+            .setHomeShow a{
+                display: none!important;
+            }
+        }
+        .wLineTitle {
+            max-width: 30px;
+            white-space:nowrap; /*文本不换行*/
+            text-overflow:ellipsis;/*设置超出部分显示...*/
+            -o-text-overflow:ellipsis;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="main_body">
+{% if showMenu %}
+<div class="layui-layout layui-layout-admin showMenu">
+{% else %}
+    {% ifequal curUrl "/v1/common/welcome/info/edit4super.html" %}
+    <div class="layui-layout layui-layout-admin showMenu">
+    {% else %}
+    <div class="layui-layout layui-layout-admin">
+    {% endifequal %}
+{% endif %}
+    <!-- 顶部 -->
+    <div class="layui-header header">
+        <div class="layui-main mag0">
+            <a href="{{sessionInfo.WelcomeUrl}}" class="logo">
+                {% ifequal sessionInfo.SchoolName "" %}
+                    {{webConfig.AppName}}
+                {% else %}
+                    <script>
+                        var strTitle = "{{sessionInfo.SchoolName}}";
+                        if(strTitle.length>6){
+                            strTitle = strTitle.substring(0,6);
+                            document.write(strTitle);
+                        }else{
+                            document.write(strTitle);
+                        }
+                    </script>
+                {% endifequal %}
+            </a>
+            <!-- 显示/隐藏菜单 -->
+            <a href="javascript:;" class="seraph hideMenu icon-caidan" id="text_menu"></a>
+            <!-- 顶级菜单 -->
+            <ul class="layui-nav mobileTopLevelMenus" mobile>
+                <li class="layui-nav-item" data-menu="contentManagement">
+                    <a href="javascript:void(0);"><i class="seraph icon-caidan"></i><cite></cite></a>
+                    <dl class="layui-nav-child" id="mobileTopLevelMenusChild">
+                        {% if menus %}
+                            {% for menu in menus %}
+                            <dd class="{{menu.MenuId}}" data-menu="{{menu.MenuId}}"><a href="javascript:;"><i class="layui-icon" data-icon="&#{{menu.Icon}};">&#{{menu.Icon}};</i><cite>{{menu.Title}}</cite></a></dd>
+                            {% endfor %}
+                        {% else %}
+                        {% ifequal sessionInfo.Level 1 %}
+                        <!--
+                            <dd class="seraphApi" data-menu="seraphApi"><a href="javascript:;"><i class="layui-icon" data-icon="&#xe632;">&#xe632;</i><cite>权限</cite></a></dd>
+                        -->
+                        {% endifequal %}
+                        {% endif %}
+                    </dl>
+                </li>
+            </ul>
+            <ul class="layui-nav topLevelMenus" style="padding-left:0;" id="topLevelMenusChild" pc>
+                {% if menus %}
+                    {% for menu in menus %}
+                    <li class="layui-nav-item {{menu.MenuId}}" data-menu="{{menu.MenuId}}">
+                        <a href="javascript:;"><i class="layui-icon" data-icon="&#{{menu.Icon}};">&#{{menu.Icon}};</i><cite>{{menu.Title}}</cite></a>
+                    </li>
+                    {% endfor %}
+                {% else %}
+                {% ifequal sessionInfo.Level 1 %}
+                    <!--
+                    <li class="layui-nav-item seraphApi" data-menu="seraphApi" pc>
+                        <a href="javascript:;"><i class="layui-icon" data-icon="&#xe632;">&#xe632;</i><cite>权限</cite></a>
+                    </li>
+                    -->
+                {% endifequal %}
+                {% endif %}
+            </ul>
+            <!-- 顶部右侧菜单 -->
+            <ul class="layui-nav top_menu">
+                {% ifequal sessionInfo.Super true %}
+                    {% ifequal sessionInfo.Level 1 %}
+                <li class="layui-nav-item" pc>
+                    <a href="/v1/common/welcome/man/man.html"><i class="layui-icon" data-icon="&#xe620;" style="padding: 0">&#xe620;</i><cite>菜单设置</cite></a>
+                </li>
+                    {% endifequal %}
+                {% endifequal %}
+                {% if menus %}
+                <li class="layui-nav-item setHomeShow" pc>
+                    <a href="javascript:;" class="setHomeBtn"><i class="layui-icon" data-icon="&#xe600;"  style="padding: 0">&#xe600;</i><cite>设为首页</cite><span class="layui-badge-dot"></span></a>
+                </li>
+                {% endif %}
+                <li class="layui-nav-item" id="userInfo">
+                    <a href="javascript:;"><img src="/statics/images/face.jpg?v={{webConfig.JsVersion}}" class="layui-nav-img userAvatar" width="35" height="35">
+                        <cite class="adminName" title="{{sessionInfo.UsernameStar}}">
+                            <!-- {{sessionInfo.Username}} -->
+                            {% ifequal sessionInfo.Super true %}
+
+                                {% ifequal sessionInfo.Level 2 %}
+                                (<span title="{{sessionInfo.Username}}-{{sessionInfo.AgentName}}" class="wLineTitle">{{sessionInfo.AgentName}}</span>)
+                                {% endifequal %}
+                                {% ifequal sessionInfo.Level 3 %}
+                                (<span title="{{sessionInfo.Username}}-{{sessionInfo.AgentName}}" class="wLineTitle">{{sessionInfo.AgentName}}</span>)
+                                {% endifequal %}
+                                {% ifequal sessionInfo.Level 4 %}
+                                (<span title="{{sessionInfo.Username}}-{{sessionInfo.AgentName}}" class="wLineTitle">{{sessionInfo.AgentName}}</span>)
+                                {% endifequal %}
+                                {% ifequal sessionInfo.Level 5 %}
+                                (<span title="{{sessionInfo.Username}}-{{sessionInfo.AgentName}}" class="wLineTitle">{{sessionInfo.AgentName}}</span>)
+                                {% endifequal %}
+                                {% ifequal sessionInfo.Level 6 %}
+                                (<span title="{{sessionInfo.Username}}-{{sessionInfo.SchoolName}}" class="wLineTitle">{{sessionInfo.SchoolName}}</span>)
+                                {% endifequal %}
+                                {% ifequal sessionInfo.Level 7 %}
+                                (<span title="{{sessionInfo.Username}}-{{sessionInfo.PlaceName}}" class="wLineTitle">{{sessionInfo.PlaceName}}</span>)
+                                {% endifequal %}
+
+                            {% endifequal %}
+                            {% ifequal sessionInfo.Super false %}
+                                {% ifequal sessionInfo.Level 2 %}
+                                (<span title="全国管理员" class="wLineTitle">{{sessionInfo.AgentName}}</span>)
+                                {% endifequal %}
+                                {% ifequal sessionInfo.Level 3 %}
+                                (<span title="分区管理员" class="wLineTitle">{{sessionInfo.AgentName}}</span>)
+                                {% endifequal %}
+                                {% ifequal sessionInfo.Level 4 %}
+                                (<span title="省级管理员" class="wLineTitle">{{sessionInfo.AgentName}}</span>)
+                                {% endifequal %}
+                                {% ifequal sessionInfo.Level 5 %}
+                                (<span title="市级管理员" class="wLineTitle">{{sessionInfo.AgentName}}</span>)
+                                {% endifequal %}
+                                {% ifequal sessionInfo.Level 6 %}
+                                (<span title="学校管理员" class="wLineTitle">{{sessionInfo.SchoolName}}</span>)
+                                {% endifequal %}
+                                {% ifequal sessionInfo.Level 7 %}
+                                (<span title="场地管理员" class="wLineTitle">{{sessionInfo.PlaceName}}</span>)
+                                {% endifequal %}
+                            {% endifequal %}
+                        </cite>
+                    </a>
+                    <dl class="layui-nav-child" id="selectSuper">
+                        {% if menus %}
+                        {% ifequal sessionInfo.Super true %}
+
+                            {% ifequal sessionInfo.Level 1 %}
+                            <dd><a href="javascript:;" onclick="switchRole(1);"><cite><span class="red">*</span>选择超级管理员【当前使用】</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader1"><cite>选择代理</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader2"><cite>选择学校</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader3"><cite>选择场地</cite></a></dd>
+                            {% endifequal %}
+
+                            {% ifequal sessionInfo.Level 2 %}
+                            <dd><a href="javascript:;" id="openWinHeader1"><cite><span class="red">*</span>选择代理【{{sessionInfo.AgentName}}】</cite></a></dd>
+                            <dd><a href="javascript:;" onclick="switchRole(1);"><cite>选择超级管理员</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader2"><cite>选择学校</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader3"><cite>选择场地</cite></a></dd>
+                            {% endifequal %}
+
+                            {% ifequal sessionInfo.Level 3 %}
+                            <dd><a href="javascript:;" id="openWinHeader1"><cite><span class="red">*</span>选择代理【{{sessionInfo.AgentName}}】</cite></a></dd>
+                            <dd><a href="javascript:;" onclick="switchRole(1);"><cite>选择超级管理员</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader2"><cite>选择学校</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader3"><cite>选择场地</cite></a></dd>
+                            {% endifequal %}
+
+                            {% ifequal sessionInfo.Level 4 %}
+                            <dd><a href="javascript:;" id="openWinHeader1"><cite><span class="red">*</span>选择代理【{{sessionInfo.AgentName}}】</cite></a></dd>
+                            <dd><a href="javascript:;" onclick="switchRole(1);"><cite>选择超级管理员</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader2"><cite>选择学校</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader3"><cite>选择场地</cite></a></dd>
+                            {% endifequal %}
+
+                            {% ifequal sessionInfo.Level 5 %}
+                            <dd><a href="javascript:;" id="openWinHeader1"><cite><span class="red">*</span>选择代理【{{sessionInfo.AgentName}}】</cite></a></dd>
+                            <dd><a href="javascript:;" onclick="switchRole(1);"><cite>选择超级管理员</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader2"><cite>选择学校</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader3"><cite>选择场地</cite></a></dd>
+                            {% endifequal %}
+
+                            {% ifequal sessionInfo.Level 6 %}
+                            <dd><a href="javascript:;" id="openWinHeader2"><cite><span class="red">*</span>选择学校【{{sessionInfo.SchoolName}}】</cite></a></dd>
+                            <dd><a href="javascript:;" onclick="switchRole(1);"><cite>选择超级管理员</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader1"><cite>选择代理</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader3"><cite>选择场地</cite></a></dd>
+                            {% endifequal %}
+
+                            {% ifequal sessionInfo.Level 7 %}
+                            <dd><a href="javascript:;" id="openWinHeader3"><cite><span class="red">*</span>选择场地【{{sessionInfo.PlaceName}}】</cite></a></dd>
+                            <dd><a href="javascript:;" onclick="switchRole(1);"><cite>选择超级管理员</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader1"><cite>选择代理</cite></a></dd>
+                            <dd><a href="javascript:;" id="openWinHeader2"><cite>选择学校</cite></a></dd>
+                            {% endifequal %}
+                            <fieldset class="layui-elem-field" style="margin-bottom: 0;"></fieldset>
+                        {% endifequal %}
+                        {% ifequal sessionInfo.Super true %}
+                            <dd><a href="javascript:;" onclick="showMyInfo();"><cite>我的信息</cite></a></dd>
+                        {% endifequal %}
+                        {% ifequal sessionInfo.Super false %}
+                            {% ifequal sessionInfo.Level 2 %}
+                                <dd><a href="javascript:;" onclick="showMyInfo();"><cite>我的信息</cite></a></dd>
+                            {% endifequal %}
+                            {% ifequal sessionInfo.Level 3 %}
+                                <dd><a href="javascript:;" onclick="showMyInfo();"><cite>我的信息</cite></a></dd>
+                            {% endifequal %}
+                            {% ifequal sessionInfo.Level 4 %}
+                                <dd><a href="javascript:;" onclick="showMyInfo();"><cite>我的信息</cite></a></dd>
+                            {% endifequal %}
+                            {% ifequal sessionInfo.Level 5 %}
+                                <dd><a href="javascript:;" onclick="showMyInfo();"><cite>我的信息</cite></a></dd>
+                            {% endifequal %}
+                            {% ifequal sessionInfo.Level 6 %}
+                                <dd><a href="javascript:;" onclick="showMyInfo('{{sessionInfo.SchoolId}}');"><cite>我的信息(学校管理员)</cite></a></dd>
+                            {% endifequal %}
+                            {% ifequal sessionInfo.Level 7 %}
+                                <dd><a href="javascript:;" onclick="showMyInfo();"><cite>我的信息</cite></a></dd>
+                            {% endifequal %}
+                            {% ifequal sessionInfo.Level 8 %}
+                                <dd><a href="javascript:;" onclick="showMyInfo();"><cite>我的信息</cite></a></dd>
+                            {% endifequal %}
+                        {% endifequal %}
+                        <fieldset class="layui-elem-field" style="margin-bottom: 0;"></fieldset>
+                        {% endif %}
+                        <dd><a href="javascript:;" class="signOut"><cite>版本：{{webConfig.JsVersion}}</cite></a></dd>
+                        <fieldset class="layui-elem-field" style="margin-bottom: 0;"></fieldset>
+                        <dd><a href="javascript:;" onclick="doLogout();" class="signOut"><cite>安全退出</cite></a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- 左侧导航 -->
+    <div class="layui-side layui-bg-black">
+        <div class="navBar layui-side-scroll" id="navBar">
+            <ul class="layui-nav layui-nav-tree">
+                <li class="layui-nav-item layui-this"></li>
+            </ul>
+        </div>
+    </div>
+    <!-- 右侧内容 -->
+    <div class="layui-body layui-form" id="htmlBackground" style="border:0;overflow:auto;">
+        <div class="layui-card" pc>
+            <div class="layui-card-body" style="padding:12px 15px 8px 20px;line-height: 20px;">
+				  <span class="layui-breadcrumb" lay-filter="breadcrumb" style="visibility: visible;">
+					<a href="javascript:">{{firstTitle}}</a><span lay-separator="">/</span>
+					<a href="javascript:void(0);" id="headerSecondTitle">{{secondTitle}}</a><span lay-separator="">/</span>
+					<a><cite>{{curPage}}</cite></a>
+				  </span>
+                <span style="float:right;display:none;" id="headerMenuLeftBtn">右边</span>
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+        <div id="contextPage" style="padding: 0 20px;">
+            {% block content %}
+
+            {% endblock %}
+        </div>
+    </div>
+</div>
+<!-- 移动导航 -->
+<div class="site-tree-mobile"><i class="layui-icon">&#xe602;</i></div>
+<div class="site-mobile-shade"></div>
+<script>
+    // 判断菜单路径
+    function initMenu() {
+        /*命名有规则的 v1代表版本号，一级，二级，三级菜单*/
+        var curUrl = '{{curUrl}}';
+        if(curUrl.length>1){
+            var str = curUrl;
+            var array = str.split('/');
+            var menuFirst = array[3];
+            var menuSecondTemp = array[4];
+            if(menuSecondTemp.length>1){
+                var array2 = menuSecondTemp.split('.');
+                var menuSecond = array2[0];
+                var cur_id = menuFirst+'4'+menuSecond;
+                // console.log(cur_id,array[2],menuFirst);
+                layui.use(['jquery', 'layer'], function(){
+                    var $ = layui.$;
+                    if(curUrl === "/v1/memberCenter/coach/curriculum/list.html"){
+                        setTimeout(function(){
+                            $("#"+cur_id).addClass("layui-this");
+                            $("."+array[2]).addClass("layui-this");
+                            $("#"+menuFirst).addClass("layui-nav-itemed");
+                        },30);
+                    }else{
+                        $("#"+cur_id).addClass("layui-this");
+                        $("."+array[2]).addClass("layui-this");
+                        $("#"+menuFirst).addClass("layui-nav-itemed");
+                    }
+                });
+            }
+        }
+    }
+    // 退出登录
+    function doLogout() {
+        var info = {};
+        layer.confirm('您确定安全退出？', {icon: 3, title:'警告'}, function(){
+            $.ajax({
+                url:"/admin/login/doLogout",
+                type:'post',
+                contentType:'application/json',
+                timeout: 10000,
+                data:JSON.stringify(info),
+                beforeSend:function () {
+                    this.layerIndex = layer.load(0, { shade: [0.5, '#393D49'] });
+                },
+                success:function(data){
+                    if(data.code === 0){
+                        window.location.reload();
+                    }else{
+                        layer.msg(data.msg,{icon: 5}); //失败的表情,设置
+                    }
+                },
+                error:function(xhr, textStatus, errorThrown) {
+                    console.log('textStatus: '+textStatus+', errorThrown: '+errorThrown+', xhr.status:'+xhr.status + ', xhr.readyState:' + xhr.readyState);
+                    if (textStatus === 'timeout') {
+                        layer.alert("请求服务器超时");
+                    } else if (xhr.status >= 500){
+                        layer.alert("服务器繁忙,请稍后");
+                    }  else if (xhr.status === 403){
+                        layer.alert("系统权限出错，请联系管理员!");
+                    } else{
+                        layer.alert('退出失败',{
+                            icon : 5,
+                            closeBtn: 0,
+                            anim: 4,
+                            title: '错误！',
+                            btnAlign: 'c',
+                            btn: '确认',
+                        }, function(index, layero){
+                            layer.msg("跳转中...");
+                            location.reload();
+                        });
+                    }
+                },
+                complete: function () {
+                    layer.close(this.layerIndex);
+                },
+            })
+        });
+    }
+
+    // 生成唯一编号
+    function getOnlyIdByRandom(id) {
+        $.ajax({
+            url:"/v1/common/welcome/getOnlyId",
+            type:'get',
+            contentType:'application/json',
+            timeout: 30000,
+            data:{},
+            beforeSend:function () {
+
+            },
+            success:function(data){
+                if(data.code === 0 && data.data != null && data.data.id != null){
+                    $("#"+id).val(data.data.id)
+                }
+            },
+            statusCode:{401:function(){window.location.href="/admin/login?code=401";}},
+            error:function(xhr, textStatus, errorThrown) {
+                console.log('textStatus: '+textStatus+', errorThrown: '+errorThrown+', xhr.status:'+xhr.status + ', xhr.readyState:' + xhr.readyState);
+                if (textStatus === 'timeout') {
+                    layer.alert("请求服务器超时");
+                } else if (xhr.status >= 500){
+                    layer.alert("服务器繁忙,请稍后");
+                }  else if(xhr.status === 401){
+                    layer.alert('请重新登录',{
+                        icon : 5,
+                        closeBtn: 0,
+                        anim: 4,
+                        title: '错误！',
+                        btnAlign: 'c',
+                        btn: '确认',
+                    }, function(index, layero){
+                        layer.msg("跳转中...");
+                        location.reload();
+                    });
+                } else{
+                    layer.alert('系统繁忙，请稍后再试！')
+                }
+            },
+            complete: function () {
+                // layer.close(this.layerIndex);
+            },
+        })
+    }
+
+</script>
+<script type="text/javascript">
+    var getMenuPath = "/v1/seraphApi/menus/man/getTree?init&v={{webConfig.JsVersion}}";
+    var isDefaultPath = false;
+    {% ifequal sessionInfo.Uid 0 %}
+    window.location.href="/admin/login?code=4010";
+    {% endifequal %}
+    {% ifequal sessionInfo.Level 1 %}
+        {% if menus %}
+
+        {% else %}
+            getMenuPath = "/statics/json/nav.json";
+            isDefaultPath = true;
+        {% endif %}
+    {% endifequal %}
+</script>
+<script type="text/javascript" src="/statics/js/common/index.js?v={{webConfig.JsVersion}}"></script>
+<script type="text/javascript" src="/statics/js/cache.js?v={{webConfig.JsVersion}}"></script>
+    {% ifequal sessionInfo.Super true %}
+    <script>
+        function showMyInfo() {
+            {# 管理员 #}
+            //window.location.href= "/v1/memberCenter/identity/user/edit4super.html"
+            window.location.href= "/v1/common/welcome/info/edit4super.html"
+        }
+    </script>
+    {% endifequal %}
+    {% ifequal sessionInfo.Super false %}
+        {% ifequal sessionInfo.Level 2 %}
+        <script>
+            function showMyInfo() {
+                {# 全国代理 #}
+                window.location.href= "/v1/memberCenter/agent/behalf/edit4country.html"
+            }
+        </script>
+        {% endifequal %}
+        {% ifequal sessionInfo.Level 3 %}
+        <script>
+            function showMyInfo() {
+                {# 分区代理 #}
+                window.location.href= "/v1/memberCenter/agent/behalf/edit4country.html"
+            }
+        </script>
+        {% endifequal %}
+        {% ifequal sessionInfo.Level 4 %}
+        <script>
+            function showMyInfo() {
+                {# 省代理 #}
+                window.location.href= "/v1/memberCenter/agent/behalf/edit4country.html"
+            }
+        </script>
+        {% endifequal %}
+        {% ifequal sessionInfo.Level 5 %}
+        <script>
+            function showMyInfo() {
+                {# 市代理 #}
+                window.location.href= "/v1/driverMan/school/list/edit4country4city.html"
+            }
+        </script>
+        {% endifequal %}
+        {% ifequal sessionInfo.Level 6 %}
+        <script>
+            function showMyInfo(sid) {
+                {# 学校管理员 #}
+                window.location.href= "/v1/driverMan/school/list/edit.html?id="+sid
+            }
+        </script>
+        {% endifequal %}
+        {% ifequal sessionInfo.Level 7 %}
+        <script>
+            function showMyInfo() {
+                {# 场地管理员 #}
+                window.location.href = "/v1/contentManagement/home/accSet/setPlace.html"
+            }
+        </script>
+        {% endifequal %}
+        {% ifequal sessionInfo.Level 8 %}
+        <script>
+            function showMyInfo() {
+                {# 员工 #}
+                window.location.href = "/v1/contentManagement/home/accSet/edit4employee.html"
+            }
+        </script>
+        {% endifequal %}
+    {% endifequal %}
+
+{% ifequal sessionInfo.Super true %}
+    <script>
+     var welcomeUrl = "{{sessionInfo.WelcomeUrl}}";
+     var homeUrl = "{{sessionInfo.Url}}";
+    </script>
+<!--------代理列表 只顯示 -------->
+<div id="openWinDivHeader1" style="display: none;">
+    <form class="layui-form">
+        <table id="newListHeader1" lay-filter="newListHeader1"></table>
+        <script type="text/javascript" src="/statics/js/common/header/agentList.js?v={{webConfig.JsVersion}}"></script>
+    </form>
+</div>
+<!--------學校列表 只顯示 -------->
+<div id="openWinDivHeader2" style="display: none;">
+    <blockquote class="layui-elem-quote quoteBox">
+        <form class="layui-form">
+            <div class="layui-inline">
+                <div class="layui-input-inline" style="width: 150px;">
+                    <input type="text" class="layui-input searchValHeader2" placeholder="输入搜索的驾校名称"/>
+                </div>
+                <div class="layui-input-inline" class="province" style="width: 140px;" pc>
+                    <select name="provinceHeader2" lay-filter="provinceHeader2">
+                        <option value="">请选择省</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" class="city" style="width: 140px;" pc>
+                    <select name="cityHeader2" lay-filter="cityHeader2" disabled>
+                        <option value="">请选择市</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" class="area" style="width: 140px;" pc>
+                    <select name="areaHeader2" lay-filter="areaHeader2" disabled>
+                        <option value="">请选择县/区</option>
+                    </select>
+                </div>
+                <a class="layui-btn search_btnHeader2" data-type="reload">搜索</a>
+            </div>
+        </form>
+    </blockquote>
+    <form class="layui-form">
+        <table id="newListHeader2" lay-filter="newListHeader2"></table>
+        <script type="text/javascript" src="/statics/js/common/header/schoolList.js?v={{webConfig.JsVersion}}"></script>
+    </form>
+</div>
+<!--------場地列表 只顯示 -------->
+<div id="openWinDivHeader3" style="display: none;">
+    <blockquote class="layui-elem-quote quoteBox">
+        <form class="layui-form">
+            <div class="layui-inline">
+                <div class="layui-input-inline" style="width: 150px;">
+                    <input type="text" class="layui-input searchValHeader31" placeholder="输入搜索的驾校名称"/>
+                </div>
+                <div class="layui-input-inline" style="width: 150px;">
+                    <input type="text" class="layui-input searchValHeader32" placeholder="输入搜索的场地名称"/>
+                </div>
+                <div class="layui-input-inline" class="province" style="width: 140px;" pc>
+                    <select name="provinceHeader3" lay-filter="provinceHeader3" lay-verify="level_code">
+                        <option value="">请选择省</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" class="city" style="width: 140px;" pc>
+                    <select name="cityHeader3" lay-filter="cityHeader3" disabled>
+                        <option value="">请选择市</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" class="area" style="width: 140px;" pc>
+                    <select name="areaHeader3" lay-filter="areaHeader3" disabled>
+                        <option value="">请选择县/区</option>
+                    </select>
+                </div>
+                <a class="layui-btn search_btnHeader3" data-type="reload">搜索</a>
+            </div>
+        </form>
+    </blockquote>
+    <form class="layui-form">
+        <table id="newListHeader3" lay-filter="newListHeader3"></table>
+        <script type="text/javascript" src="/statics/js/common/header/placeList.js?v={{webConfig.JsVersion}}"></script>
+    </form>
+</div>
+<!------省市區 js 開始-------->
+<script type="text/javascript">
+    var modeEnvironment = "{{webConfig.Mode}}";
+    layui.config({
+        base : "/statics/js/common/"
+    }).use([ 'layer', 'jquery', "addressHeader2" , "addressHeader3" ], function() {
+        layui.addressHeader2("");
+        layui.addressHeader3("");
+    });
+</script>
+<!------省市區 js 結束-------->
+<script>
+    function switchRole(val) {
+        // layer.msg(val);
+        if(val === 1){ // ajax
+            var index = layer.msg('切换中，请稍候',{icon: 16,time:false,shade:0.8});
+            $.ajax({
+                url:"/v1/common/welcome/menus/man/toAdmin/1",
+                type:'post',
+                contentType:'application/json',
+                timeout: 10000,
+                data:{},
+                beforeSend:function () {
+
+                },
+                success:function(data){
+                    if(data.code === 0){
+                        layer.msg("切换操作成功");
+                        window.location.href=homeUrl+"?"+new Date().getTime()
+                    }else{
+                        layer.msg(data.msg,{icon: 5});
+                    }
+                },
+                statusCode:{401:function(){window.location.href="/admin/login?code=401";}},
+                error:function(xhr, textStatus, errorThrown) {
+                    console.log('textStatus: '+textStatus+', errorThrown: '+errorThrown+', xhr.status:'+xhr.status + ', xhr.readyState:' + xhr.readyState);
+                    if (textStatus === 'timeout') {
+                        layer.alert("请求服务器超时");
+                    } else if (xhr.status >= 500){
+                        layer.alert("服务器繁忙,请稍后");
+                    } else{
+                        layer.alert('请重新登录',{
+                            icon : 5,
+                            closeBtn: 0,
+                            anim: 4,
+                            title: '错误！',
+                            btnAlign: 'c',
+                            btn: '确认',
+                        }, function(index, layero){
+                            layer.msg("跳转中...");
+                            location.reload();
+                        });
+                    }
+                },
+                complete: function () {
+                    layer.close(index);
+                },
+            })
+        }
+    }
+
+    layui.use(['jquery', 'layer'], function(){
+        var $ = layui.$;
+        $("#openWinHeader1").on("click",function(){
+            $("#openWinDivHeader1").attr("display","block");
+            layer.open({
+                type: 1,
+                title:"选择代理",
+                area: isPcAgent === true ? ['1000px','530px'] : 'auto', //宽高
+                content: $('#openWinDivHeader1')
+                ,cancel: function(){
+                    //右上角关闭回调
+                    $("#openWinDivHeader1").attr("display","none");
+                }
+            });
+        });
+
+        $("#openWinHeader2").on("click",function(){
+            $("#openWinDivHeader2").attr("display","block");
+            layer.open({
+                type: 1,
+                title:"选择学校",
+                area: isPcAgent === true ? ['1000px','530px'] : 'auto', //宽高
+                content: $('#openWinDivHeader2')
+                ,cancel: function(){
+                    //右上角关闭回调
+                    $("#openWinDivHeader2").attr("display","none");
+                }
+            });
+        });
+
+        $("#openWinHeader3").on("click",function(){
+            $("#openWinDivHeader3").attr("display","block");
+            layer.open({
+                type: 1,
+                title:"选择场地",
+                area: isPcAgent === true ? ['1000px','530px'] : 'auto', //宽高
+                content: $('#openWinDivHeader3')
+                ,cancel: function(){
+                    //右上角关闭回调
+                    $("#openWinDivHeader3").attr("display","none");
+                }
+            });
+        });
+
+        //设为首页
+        $(".setHomeBtn").on("click",function(){
+            var index = layer.msg('设为首页中，请稍候',{icon: 16,time:false,shade:0.8});
+            var fordata = {}; // 生成文件对象
+            fordata.uid = 100;
+            //获取当前窗口的路径
+            var pathname = window.location.pathname;
+            //获取参数
+            var search = window.location.search;
+            fordata.url=pathname+search;
+            $.ajax({
+                url:'/v1/common/welcome/setHomePage',
+                type:'post',
+                processData:false,
+                contentType:false,
+                data:JSON.stringify(fordata),
+                timeout: 10000,
+                beforeSend:function () {},
+                success:function(data){
+                    if(data.code === 0 && data.sub_code === 0){
+                        setTimeout(function(){
+                            top.layer.close(index);
+                            layer.msg("设为首页成功,下次登录生效！");
+                            setTimeout(function(){
+                                layer.close(index);
+                                location.reload();
+                            },1000);
+                        },300);
+                    }else{
+                        layer.msg(data.msg,{icon: 5});//失败的表情,设置
+                    }
+                },
+                statusCode:{401:function(){window.location.href="/admin/login?code=401";}},
+                error:function(xhr, textStatus, errorThrown) {
+                    console.log('textStatus: '+textStatus+', errorThrown: '+errorThrown+', xhr.status:'+xhr.status + ', xhr.readyState:' + xhr.readyState);
+                    if (textStatus === 'timeout') {
+                        layer.alert("请求服务器超时");
+                    } else if (xhr.status >= 500){
+                        layer.alert("服务器繁忙,请稍后");
+                    } else{
+                        layer.alert('请重新登录',{
+                            icon : 5,
+                            closeBtn: 0,
+                            anim: 4,
+                            title: '错误！',
+                            btnAlign: 'c',
+                            btn: '确认',
+                        }, function(index, layero){
+                            layer.msg("跳转中...");
+                            location.reload();
+                        });
+                    }
+                },
+                complete: function () {
+                    layer.close(this.layerIndex);
+                },
+            });
+            return false;
+        });
+    });
+
+
+
+</script>
+{% endifequal %}
+{% block footer %}
+
+{% endblock %}
+</body>
+{% block window %}
+
+{% endblock %}
+</html>

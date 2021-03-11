@@ -26,5 +26,6 @@ func InitDb(config *configer.Config) (db *gorm.DB, err error) {
 	// 自动迁移模式
 	db.AutoMigrate(&datamodels.Ssq{})
 	db.AutoMigrate(&datamodels.Dlt{})
+	db.AutoMigrate(&datamodels.Kl8{})
 	return db, err
 }

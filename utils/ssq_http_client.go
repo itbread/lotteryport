@@ -38,6 +38,15 @@ type SsqResp struct {
 	Tflag     int              `json:"Tflag"`
 	Result    []datamodels.Ssq `json:"result"`
 }
+type Kl8Resp struct {
+	State     int              `json:"state"`
+	Message   string           `json:"message"`
+	PageNo    int              `json:"pageNo"`    //第几页
+	PageCount int              `json:"pageCount"` //总页数
+	CountNum  int              `json:"countNum"`  //数目
+	Tflag     int              `json:"Tflag"`
+	Result    []datamodels.Kl8 `json:"result"`
+}
 
 type SsqBallInfo struct {
 	State     int              `json:"state"`
@@ -136,6 +145,34 @@ func DoHttpget(issueStart int, issueEnd int, pageNo int, resp interface{}) error
 
 func GetSsqHistory(issueStart int, issueEnd int, pageNo int, resp interface{}) error {
 	url := fmt.Sprintf("http://www.cwl.gov.cn/cwl_admin/kjxx/findDrawNotice?name=ssq&&issueStart=%v&issueEnd=%v&pageNo=%v", issueStart, issueEnd, pageNo)
+	method := "GET"
+	payload := strings.NewReader("")
+
+	client := &http.Client{
+	}
+	req, err := http.NewRequest(method, url, payload)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	req.Header.Add("Accept", " application/json, text/javascript, */*; q=0.01")
+	req.Header.Add("Accept-Encoding", " gzip, deflate")
+	req.Header.Add("Accept-Language", " en-US,en;q=0.9")
+	req.Header.Add("Connection", " keep-alive")
+	req.Header.Add("Host", " www.cwl.gov.cn")
+	req.Header.Add("Referer", " http://www.cwl.gov.cn/kjxx/ssq/kjgg/")
+	req.Header.Add("X-Requested-With", " XMLHttpRequest")
+	req.Header.Add("Cookie", "_Jo0OQK=56DADB9BECDA87E0C634D511106103397B94DF68802B86557F473F0C91F14D6003C1D0C785395717B723D546E27D3996097A5BDF5B766BAE0F3BA7DA69DB62E60A7B9652B349A2849AA5D71C9A647C60CA55D71C9A647C60CA54F27B4D560638D7FGJ1Z1OQ==")
+
+	res, err := client.Do(req)
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	json.Unmarshal(body, &resp)
+	fmt.Println("=====================", resp)
+	return err
+}
+func GetKl8History(issueStart int, issueEnd int, pageNo int, resp interface{}) error {
+	url := fmt.Sprintf("http://www.cwl.gov.cn/cwl_admin/kjxx/findDrawNotice?name=kl8&&issueStart=%v&issueEnd=%v&pageNo=%v", issueStart, issueEnd, pageNo)
 	method := "GET"
 	payload := strings.NewReader("")
 

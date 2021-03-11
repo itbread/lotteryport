@@ -24,9 +24,16 @@ func main() {
 		defer cancel()
 		app.Shutdown(ctx)
 	})
-	tmpl := iris.Django("./templates/views", ".html").Reload(true) //是否更新
+	tmpl := iris.Django("./web/views", ".html").
+		Reload(true) //是否更新
 	app.RegisterView(tmpl)
-	app.HandleDir("/statics", "./templates/statics") //指定静态文件路径
+	app.HandleDir("/statics", "./web/statics") //指定静态文件路径
+
+	app.OnAnyErrorCode(func(ctx iris.Context) { //错误页面设置
+		Status := ctx.GetStatusCode()
+		ctx.ViewData("Status", Status)
+		ctx.View("shared/error.html")
+	})
 	routers.Route(app, config)
 	//　使用网络地址启动服务
 	portStr := ":80"
